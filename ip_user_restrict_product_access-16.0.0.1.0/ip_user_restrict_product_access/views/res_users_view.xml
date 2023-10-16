@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<record model="ir.ui.view" id="view_users_form_inherit_ip">
+        <field name="name">res.users.inherit.ip</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='access_rights']" position="after">
+                <page string="Allowed Products" groups="ip_user_restrict_product_access.group_product_restriction_manager">
+                    <group>
+                        <group>
+                            <field name="type_of_product" widget="radio"/>
+                            <field name="categ_ids" attrs="{'invisible':[('type_of_product', '!=', 'category_wise')]}" widget="many2many_tags"/>
+                            <field name="product_ids" widget="many2many_tags" attrs="{'invisible':[('type_of_product', '!=', 'product_wise')]}"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
