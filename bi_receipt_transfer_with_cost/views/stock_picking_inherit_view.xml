@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_picking_form_inherit_code_price" model="ir.ui.view">
+        <field name="name">stock.picking.form.inherit.inventory.valuation.with.cost</field>
+        <field name="model">stock.picking</field>
+        <field name="inherit_id" ref="stock.view_picking_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='operations']/field[@name='move_ids_without_package']/tree/field[@name='product_uom_qty']" position="before">
+                <field name="price_unit" string="Cost" attrs="{'column_invisible': [('parent.picking_type_code', '!=', 'incoming')],'readonly': [('purchase_line_id', '!=', False)]}"/>
+                <field name="purchase_line_id" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
