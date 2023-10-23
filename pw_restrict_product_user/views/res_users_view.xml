@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_users_form_inherit_restrict_product" model="ir.ui.view">
+            <field name="name">res.users.form.inherit.restrict.product</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook[last()]" position="inside">
+                    <page string="Allow Products" name="allow_products">
+                        <group>
+                            <group>
+                                <field name="display_type" widget="radio"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="product_ids" nolabel="1" colspan="2" options="{'no_create': True}" attrs="{'invisible': [('display_type', '=', 'category')]}"/>
+                            <field name="categ_ids" nolabel="1" colspan="2" options="{'no_create': True}" attrs="{'invisible': [('display_type', '=', 'product')]}"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
