@@ -1,0 +1,20 @@
+name,partner,account_code,date_maturity,debit,credit,amount_currency,currency
+/,Deco Addict,600000,2019-03-31,0,,-5749.99,USD
+Coffee Machine with huge 'employee's performances boosting perk',Deco Addict,600000,2019-02-15,,0,4999.99,USD
+Tax 15.00%,Deco Addict,600000,2019-02-15,,0,750,USD
+/,Oscar Morgan,101404,2019-03-10,,0,650,USD
+[CONS_DEL03] Basic Computer,Oscar Morgan,101404,2019-02-08,0,,-150,USD
+[CONS_DEL01] Server,Oscar Morgan,101404,2019-02-08,0,,-500,USD
+/,Oscar Morgan,101404,2019-03-10,,0,525,USD
+[CONS_DEL01] Server,Oscar Morgan,101404,2019-02-08,0,,-450,USD
+[CONS_DEL03] Basic Computer,Oscar Morgan,101404,2019-02-08,0,,-75,USD
+/,Azure Interior,101404,2019-03-31,,0,4610,USD
+[CONS_DEL02] Little server,Azure Interior,101404,2019-02-01,0,,-3210,USD
+[CONS_DEL03] Basic Computer,Azure Interior,101404,2019-02-01,0,,-1400,USD
+/,Azure Interior,600000,2019-03-31,0,10000,-10000,USD
+CEO wages,Azure Interior,600000,2019-02-01,,0,10000,USD
+/,Oscar Morgan,101404,2019-01-17,,0,4610,USD
+[CONS_DEL02] Little server,Oscar Morgan,101404,2019-01-17,0,,-3210,USD
+[CONS_DEL03] Basic Computer,Oscar Morgan,101404,2019-01-17,0,,-1400,USD
+Last Year Interests,Azure Interior,101404,2019-01-01,,0,102.78,USD
+Last Year Interests,Azure Interior,101404,2019-01-01,0,,-102.78,USD
