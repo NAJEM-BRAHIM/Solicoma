@@ -1,0 +1,5 @@
+=> 16.0.0.1 :Add a new CSV & Excel button for(Download Sample CSV & Excel file) in wizard
+
+=> 16.0.0.2 :Resolved Issue of Analytic Distribution values not getting saved while importing from xls file.
+
+16.0.0.3 ==> Fixed issue of when import same name Analytic Distribution at that time trace back occure and also update Analytic Distribution value. 
