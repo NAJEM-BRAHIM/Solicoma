@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="group_access_all_location" model="res.groups">
+	        <field name="name">Access All Location</field>
+	</record>
+</odoo>
