@@ -11,6 +11,7 @@ from odoo.tools import ustr
 import logging
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tools import DEFAULT_SERVER_DATE_FORMAT
+import datetime
 
 _logger = logging.getLogger(__name__)
 
@@ -227,7 +228,7 @@ class ImportJournalItemWizard(models.TransientModel):
                         try:
                             if skip_header:
                                 skip_header = False
-                                for i in range(8, len(row)):
+                                for i in range(6, len(row)):
                                     name_field = row[i]
                                     name_m2o = False
                                     if '@' in row[i]:
@@ -320,30 +321,12 @@ class ImportJournalItemWizard(models.TransientModel):
                                         continue
 
                                 if row[4] not in (None, ""):
-                                    vals.update(
-                                        {'amount_currency': float(row[4])})
-                                else:
-                                    vals.update({'amount_currency': 0})
-
-                                if row[5] not in (None, ""):
-                                    search_currency = self.env['res.currency'].search(
-                                        [('name', '=', row[5])], limit=1)
-                                    if search_currency:
-                                        vals.update(
-                                            {'currency_id': search_currency.id})
-                                    else:
-                                        skipped_line_no[str(
-                                            counter)] = " - Currency not found. "
-                                        counter = counter + 1
-                                        continue
-
-                                if row[6] not in (None, ""):
-                                    vals.update({'debit': float(row[6])})
+                                    vals.update({'debit': float(row[4])})
                                 else:
                                     vals.update({'debit': 0.0})
 
-                                if row[7] not in (None, ""):
-                                    vals.update({'credit': float(row[7])})
+                                if row[5] not in (None, ""):
+                                    vals.update({'credit': float(row[5])})
                                 else:
                                     vals.update({'credit': 0.0})
 

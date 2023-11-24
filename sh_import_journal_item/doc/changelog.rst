@@ -7,3 +7,7 @@ Intial Release
 ------------------------------
 
 [Add] Code for Partner selection for search partners by 1. Name 2. Reference 3. Id.
+
+16.0.3 (Date: 10th November 2023)
+---------------------------------------
+[FIX] issue of credit and debit were updated as zero in some currency.

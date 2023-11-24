@@ -8,7 +8,7 @@
     "category": "Accounting",
     "summary": "Import Journal Items From CSV Module, Import Journal Item From Excel App, Import Journal Entry From CSV, import Journal Entry From Excel, Import Journal Data From CSV, Import mass Journal items, import multiple journals Odoo",
     "description": """ This module is used to import journal items from CSV/Excel files. You just enable the group 'Import Journal Item' in the user setting then after that user can import journal items from the CSV/Excel file.""",
-    "version": "16.0.2",
+    "version": "16.0.3",
     "depends": [
         "sh_message",
         "account"
