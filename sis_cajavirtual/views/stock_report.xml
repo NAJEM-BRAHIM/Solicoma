@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <template id="report_report_picking_inherit_sis_cajavirtual" inherit_id="stock.report_picking">
+        <xpath expr="//table/thead/tr" position="inside">
+            <th name="th_sm_boxes"><strong>Cajas</strong></th>
+        </xpath>
+        <xpath expr="//table/tbody//tr" position="inside">
+            <td>
+                <span t-field="ml.virtual_box"/>
+            </td>
+        </xpath>
+    </template>
 
     <template id="report_delivery_document_inherit_sis_cajavirtual" inherit_id="stock.report_delivery_document">
         <xpath expr="//table[@name='stock_move_table']/thead/tr/th[@name='th_sm_quantity']" position="after">            
@@ -9,7 +19,7 @@
             <td>
                 <span t-field="move.virtual_box"/>
             </td>
-        </xpath>        
+        </xpath>
 
         <xpath expr="//table[@name='stock_move_line_table']/thead/tr/th[@name='th_sml_quantity']" position="after">
             <th name="th_sml_boxes" class="text-center"><strong>Cajas</strong></th>
