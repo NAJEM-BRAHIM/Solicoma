@@ -14,6 +14,7 @@
         'views/stock_views.xml',
         'views/sale_report.xml',
         'views/stock_report.xml',
+        'views/report_invoice.xml',
         'views/product_views.xml',
     ],
     'application': False,
