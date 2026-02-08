@@ -5,9 +5,9 @@
         <xpath expr="//table/thead/tr" position="inside">
             <th name="th_sm_boxes"><strong>Cajas</strong></th>
         </xpath>
-        <xpath expr="//table/tbody/tr" position="inside">
-            <td>
-                <span t-field="ml.virtual_box"/>
+        <xpath expr="//table/tbody/t/tr" position="inside">
+            <td class="text-right">
+                <span t-field="move.virtual_box" />
             </td>
         </xpath>
     </template>
@@ -66,18 +66,29 @@
         </xpath>        
     </template>
 
-    <template id="report_package_barcode_sis_cajavirtual" inherit_id="stock.report_package_barcode">
-        <xpath expr="//table[1]/thead/tr/th[@name='th_uom']" position="after">
-          <th name="th_box" class="text-right">Cajas</th>
+    <template id="report_package_barcode_content_sis_cajavirtual"
+        inherit_id="stock.report_package_barcode_content">
+        <xpath expr="//table/thead/tr/th[@name='th_quantity']" position="attributes">
+            <attribute name="style">width: 10%;</attribute>
         </xpath>
-        <xpath expr="//table[1]/tbody/tr/td[3]" position="after">
-          <td class="text-right">
-              <span t-field="l.virtual_box"/>
-          </td>
+        <xpath
+            expr="//t[@t-foreach='package_quants.product_id']//table//thead//tr//th[@name='th_quantity']"
+            position="attributes">
+            <attribute name="style">width: 10%;</attribute>
         </xpath>
-        <xpath expr="//table[1]/tbody/tr/td[1]/span" position="replace">
-          <span t-field="l.product_id.display_name"/>
+
+        <xpath expr="//table/thead/tr/th[@name='th_quantity']" position="after">
+            <th name="th_box" class="text-right" style="width: 10%;">Cajas</th>
+        </xpath>
+        <xpath
+            expr="//t[@t-foreach='package_quants.product_id']//table//thead//tr//th[@name='th_quantity']"
+            position="after">
+            <th name="th_box" class="text-right" style="width: 10%;">
+                <t t-out="sum(product_quants.mapped('virtual_box'))" />
+                <t t-out="sum(product_quants.mapped('id'))" />
+            </th>
         </xpath>
     </template>
+    
 
 </odoo>

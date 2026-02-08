@@ -20,7 +20,7 @@ class SaleOrderLine(models.Model):
             })        
         return result
 
-    def _prepare_procurement_values(self, group_id=False):
-        values = super(SaleOrderLine, self)._prepare_procurement_values(group_id)
+    def _prepare_procurement_values(self):
+        values = super(SaleOrderLine, self)._prepare_procurement_values()
         values.update({'virtual_box': self.virtual_box})
         return values

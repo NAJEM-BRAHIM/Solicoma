@@ -5,9 +5,9 @@
         <xpath expr="//table/thead/tr/th[@name='th_quantity']" position="after">
             <th name="th_boxes" class="text-right">Boxes</th>
         </xpath>
-        <xpath expr="//table/tbody/t[2]/tr/t/td[@name='td_quantity']" position="after">
-            <td name="td_quantity" class="text-center">
-                <span t-field="line.virtual_box"/>
+        <xpath expr="//tr[@name='tr_product']/td[@name='td_product_quantity']" position="after">
+            <td name=" td_boxes" class=" text-center">
+                <span t-field=" line.virtual_box"/>
             </td>
         </xpath>        
     </template>
