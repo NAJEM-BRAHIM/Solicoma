@@ -10,6 +10,16 @@
                 <span t-field="line.virtual_box" />
             </td>
         </xpath>
+        <xpath expr="//t[@t-foreach='lines_to_report']" position="after">
+            <tr>
+                <td colspan="2" class="text-right">
+                </td>
+                <td class="text-end">
+                    <span t-out="sum(lines_to_report.mapped('virtual_box'))" />
+                </td>
+                <td colspan="5"></td>
+            </tr>
+        </xpath>
     </template>
 
 </odoo>
