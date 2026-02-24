@@ -13,34 +13,28 @@ class StockMove(models.Model):
             if rec.product_id:
                 rec.price_unit = rec.product_id.standard_price
 
-    def _create_in_svl(self, forced_quantity=None):
-        """Create a `stock.valuation.layer` from `self`.
+    def _get_value_data(
+        self,
+        forced_std_price=False,
+        at_date=False,
+        ignore_manual_update=False,
+        add_extra_value=True,
+    ):
+        self.ensure_one()
+        if self.is_in and self.price_unit:
+            valued_qty = self._get_valued_qty()
+            value = self.price_unit * valued_qty
+            return {
+                'value': value,
+                'quantity': valued_qty,
+                'description': "Valued at receipt price",
+            }
 
-        :param forced_quantity: under some circunstances, the quantity to value is different than
-            the initial demand of the move (Default value = None)
-        """
-        svl_vals_list = self._get_in_svl_vals(forced_quantity)
-        return self.env['stock.valuation.layer'].sudo().create(svl_vals_list)
-
-    def _get_in_svl_vals(self, forced_quantity):
-        svl_vals_list = []
-        for move in self:
-            move = move.with_company(move.company_id)
-            valued_move_lines = move._get_in_move_lines()
-            valued_quantity = 0
-            for valued_move_line in valued_move_lines:
-                valued_quantity += valued_move_line.product_uom_id._compute_quantity(valued_move_line.quantity,
-                                                                                     move.product_id.uom_id)
-            unit_cost = move.product_id.standard_price
-            if move.product_id.cost_method != 'standard':
-                unit_cost = abs(move._get_price_unit())  # May be negative (i.e. decrease an out move).
-            svl_vals = move.product_id._prepare_in_svl_vals(forced_quantity or valued_quantity, unit_cost)
-            svl_vals.update(move._prepare_common_svl_vals())
-            if forced_quantity:
-                svl_vals['description'] = 'Correction of %s (modification of past move)' % (
-                            move.picking_id.name or move.name)
-            svl_vals_list.append(svl_vals)
-        return svl_vals_list
+        result = super(StockMove,self)._get_value_data(
+            forced_std_price=forced_std_price,
+            at_date=at_date,
+            ignore_manual_update=ignore_manual_update,
+            add_extra_value=add_extra_value,
+        )
+        return result
    
-    
-    
