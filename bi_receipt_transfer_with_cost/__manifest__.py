@@ -2,7 +2,7 @@
 # Part of BrowseInfo. See LICENSE file for full copyright and licensing details.
 {
     'name': "Receipt Transfer with Cost Price",
-    'version': "19.0.0.0",
+    'version': "19.0.0.1",
     'category': "Warehouse",
     'summary': "Receipt Cost Price in receipt purchase receipt costing receipt stock valuation costing on receipt with costing receipt valuation Inventory valuation cost with receipt cost price for valuation costing with receipt picking costing picking with cost price",
     'description': """
