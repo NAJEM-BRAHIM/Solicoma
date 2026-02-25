@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_invoice_document" inherit_id="account.report_invoice_document">
+        <xpath expr="//th[@name='th_quantity']" position="after">
+            <th name="th_boxes" class="text-end">Boxes</th>
+        </xpath>
+        <xpath expr="//td[@name='td_quantity']" position="after">
+            <td name="td_boxes" class="text-end">
+                <span t-field="line.virtual_box" />
+            </td>
+        </xpath>
+        <xpath expr="//t[@t-foreach='lines_to_report']" position="after">
+            <tr>
+                <td colspan="2" class="text-right">
+                </td>
+                <td class="text-end">
+                    <span t-out="sum(lines_to_report.mapped('virtual_box'))" />
+                </td>
+                <td colspan="5"></td>
+            </tr>
+        </xpath>
+    </template>
+
+</odoo>
