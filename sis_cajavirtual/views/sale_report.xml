@@ -12,7 +12,10 @@
         </xpath> 
         <xpath expr="//t[@t-foreach='lines_to_report']" position="after">
            <tr>
-                <td colspan="2" class="text-right">
+                <td colspan="1" class="text-right">
+                </td>
+                <td class="text-end">
+                    <span t-out="sum(lines_to_report.mapped('product_uom_qty'))"/> <span t-field="line.product_uom_id">units</span>
                 </td>
                 <td class="text-end">
                     <span t-out="sum(lines_to_report.mapped('virtual_box'))"/>
