@@ -14,9 +14,14 @@
             <xpath expr="//notebook/page[@id='aml_tab']/field[@name='line_ids']/form/group/field[@name='name']" position="after">
 				<field name='virtual_box' invisible="1"/>
             </xpath>
-            <!-- Totales debajo de las líneas de factura -->
-            <xpath expr="//notebook/page[@id='invoice_tab']/field[@name='invoice_line_ids']/list/field[@name='virtual_box']" position="after">
-                <field name="total_virtual_box" optional="show" readonly="1" sum="Total Cajas"/>
+            <!-- Totales después del campo invoice_line_ids (en account.move) -->
+            <xpath expr="//notebook/page[@id='invoice_tab']/field[@name='invoice_line_ids']" position="after">
+                <group>
+                    <group string="Totales Cajas/Unidades" col="2">
+                        <field name="total_quantity" readonly="1" string="Total Unidades"/>
+                        <field name="total_virtual_box" readonly="1" string="Total Cajas"/>
+                    </group>
+                </group>
             </xpath>
 		</field>
 	</record>
