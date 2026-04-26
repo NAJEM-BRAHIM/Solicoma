@@ -15,7 +15,7 @@
 				<field name='virtual_box' invisible="1"/>
             </xpath>
             <!-- Totales debajo de las líneas de factura -->
-            <xpath expr="//div[@name='payment_term']" position="before">
+            <xpath expr="//div[@name='amount_untaxed']" position="before">
                 <div name="virtualbox_totals" class="row mt-2 mb-2">
                     <div class="col-auto ms-auto">
                         <table class="table table-sm o_subtotal">

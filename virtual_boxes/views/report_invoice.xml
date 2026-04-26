@@ -11,7 +11,7 @@
             </td>
         </xpath>
         <!-- Totales al pie del reporte -->
-        <xpath expr="//div[@name='payment_term']" position="before">
+        <xpath expr="//div[@name='amount_untaxed']" position="before">
             <div class="row justify-content-end mb-2">
                 <div class="col-4">
                     <table class="table table-sm">
