@@ -10,21 +10,6 @@
                 <span t-field="line.virtual_box" />
             </td>
         </xpath>
-        <!-- Totales al pie del reporte -->
-        <xpath expr="//th[@name='th_boxes']" position="attributes">
-            <attribute name="class">text-end</attribute>
-        </xpath>
-        <xpath expr="//tfoot" position="inside">
-            <tr>
-                <td colspan="3" class="text-end fw-bold">Total Unidades / Cajas:</td>
-                <td class="text-end fw-bold">
-                    <span t-esc="sum(line.quantity for line in o.invoice_line_ids if line.display_type == 'product')"/>
-                </td>
-                <td class="text-end fw-bold">
-                    <span t-esc="o.total_virtual_box"/>
-                </td>
-            </tr>
-        </xpath>
     </template>
 
 </odoo>
