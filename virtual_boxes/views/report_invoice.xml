@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_invoice_document" inherit_id="account.report_invoice_document">
+        <xpath expr="//th[@name='th_quantity']" position="after">
+            <th name="th_boxes" class="text-end">Cajas</th>
+        </xpath>
+        <xpath expr="//td[@name='td_quantity']" position="after">
+            <td name="td_boxes" class="text-end">
+                <span t-field="line.virtual_box" />
+            </td>
+        </xpath>
+        <!-- Totales al pie del reporte -->
+        <xpath expr="//div[@name='payment_term']" position="before">
+            <div class="row justify-content-end mb-2">
+                <div class="col-4">
+                    <table class="table table-sm">
+                        <tbody>
+                            <tr>
+                                <td class="text-end fw-bold">Total Unidades:</td>
+                                <td class="text-end">
+                                    <span t-esc="o.total_quantity"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-end fw-bold">Total Cajas:</td>
+                                <td class="text-end">
+                                    <span t-esc="o.total_virtual_box"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+</odoo>

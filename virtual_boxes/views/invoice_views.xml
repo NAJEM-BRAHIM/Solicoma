@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="account_move_virtualbox_form" model="ir.ui.view">
+		<field name="name">account.move.virtualbox.form</field>
+		<field name="model">account.move</field>
+		<field name="inherit_id" ref="account.view_move_form"/>
+		<field name="arch" type="xml">            			
+            <xpath expr="//notebook/page[@id='invoice_tab']/field[@name='invoice_line_ids']/list/field[@name='product_uom_id']" position="after">
+				<field name='virtual_box' optional="show"/>
+            </xpath>
+            <xpath expr="//notebook/page[@id='invoice_tab']/field[@name='invoice_line_ids']/form/sheet/group/field[@name='product_uom_id']" position="after">
+				<field name='virtual_box' invisible="1"/>
+            </xpath>
+            <xpath expr="//notebook/page[@id='aml_tab']/field[@name='line_ids']/form/group/field[@name='name']" position="after">
+				<field name='virtual_box' invisible="1"/>
+            </xpath>
+            <!-- Totales debajo de las líneas de factura -->
+            <xpath expr="//div[@name='payment_term']" position="before">
+                <div name="virtualbox_totals" class="row mt-2 mb-2">
+                    <div class="col-auto ms-auto">
+                        <table class="table table-sm o_subtotal">
+                            <tbody>
+                                <tr>
+                                    <td class="text-end fw-bold">Total Unidades:</td>
+                                    <td class="text-end">
+                                        <field name="total_quantity" readonly="1"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-end fw-bold">Total Cajas:</td>
+                                    <td class="text-end">
+                                        <field name="total_virtual_box" readonly="1"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </xpath>
+		</field>
+	</record>
+</odoo>
