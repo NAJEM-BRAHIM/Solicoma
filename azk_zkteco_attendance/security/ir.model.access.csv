@@ -1,42 +1,6 @@
-# -*- coding: utf-8 -*-
-import logging
-from odoo import api, fields, models, _
-from odoo.exceptions import UserError
-
-log = logging.getLogger(__name__)
-
-
-class HrEmployee(models.Model):
-    _inherit = 'hr.employee'
-
-    device_id = fields.Char(string='Device ID', groups="hr.group_hr_user")
-
-    def action_create_machine_users(self):
-        new_wizard = self.env['azk.machine.user.create'].create({
-            'employee_ids': self.ids,
-        })
-        return {
-            'name': _('Create Machine User'),
-            'view_mode': 'form',
-            'res_model': 'azk.machine.user.create',
-            'type': 'ir.actions.act_window',
-            'target': 'new',
-            'res_id': new_wizard.id,
-        }
-
-    def action_delete_machine_users(self):
-        self.ensure_one()
-        if not self.device_id:
-            raise UserError(_('Nothing to delete, Device ID not set.'))
-
-        new_wizard = self.env['azk.machine.user.delete'].create({
-            'employee_id': self.id,
-        })
-        return {
-            'name': _('Delete Machine User'),
-            'view_mode': 'form',
-            'res_model': 'azk.machine.user.delete',
-            'type': 'ir.actions.act_window',
-            'target': 'new',
-            'res_id': new_wizard.id,
-        }
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_azk_machine,Access to Machine,model_azk_machine,hr_attendance.group_hr_attendance_officer,1,1,1,1
+access_hr_azk_attendance,Access to Attendance,model_azk_machine_attendance,hr_attendance.group_hr_attendance_officer,1,1,1,1
+access_hr_azk_attendance_report,Access to Attendance reports,model_azk_report_daily_attendance,hr_attendance.group_hr_attendance_officer,1,1,1,1
+access_azk_machine_user_create,azk_machine_user_create,model_azk_machine_user_create,hr_attendance.group_hr_attendance_officer,1,1,1,1
+access_azk_machine_user_delete,azk_machine_user_delete,model_azk_machine_user_delete,hr_attendance.group_hr_attendance_officer,1,1,1,1
