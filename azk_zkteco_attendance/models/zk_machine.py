@@ -11,28 +11,28 @@ log = logging.getLogger(__name__)
 
 
 class ZkMachine(models.Model):
-    _name = 'azk.machine'
-    _description = 'AZK Machine'
+    _name = "azk.machine"
+    _description = "AZK Machine"
 
-    name = fields.Char(string='Machine', required=True)
+    name = fields.Char(string="Machine", required=True)
     machine_ip = fields.Char("Machine IP/DNS", required=True)
-    password = fields.Char('Password', help="Password must be digits.")
-    port_num = fields.Integer(string='Port No', required=True)
+    password = fields.Char("Password", help="Password must be digits.")
+    port_num = fields.Integer(string="Port No", required=True)
     serial_num = fields.Char("Serial num", readonly=True)
     timeout = fields.Integer("Connection Timeout", default=10)
     auto_create_employee = fields.Boolean("Auto create employee", default=False)
-    address_id = fields.Many2one('res.partner', string='Working Address')
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company.id)
-    last_run_status = fields.Boolean('Machine OK', default=False)
+    address_id = fields.Many2one("res.partner", string="Working Address")
+    company_id = fields.Many2one("res.company", string="Company", default=lambda self: self.env.company.id)
+    last_run_status = fields.Boolean("Machine OK", default=False)
     last_error_msg = fields.Char("Last Error")
 
-    @api.onchange('password')
+    @api.onchange("password")
     def _onchange_password(self):
         if self.password:
             try:
                 int(self.password)
             except ValueError:
-                raise UserError(_('Password must be digits.'))
+                raise UserError(_("Password must be digits."))
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -42,25 +42,24 @@ class ZkMachine(models.Model):
                 try:
                     int(rec.password)
                 except ValueError:
-                    raise UserError(_('Password must be digits.'))
+                    raise UserError(_("Password must be digits."))
         return records
 
     def write(self, vals):
         res = super().write(vals)
-        if 'password' in vals:
+        if "password" in vals:
             for rec in self:
                 if rec.password:
                     try:
                         int(rec.password)
                     except ValueError:
-                        raise UserError(_('Password must be digits.'))
+                        raise UserError(_("Password must be digits."))
         return res
 
     def check_user_id_availabilty(self, user_id, conn=False):
         if not conn:
             conn, _ = self.connect()
-        machine_users = conn.get_users()
-        for user in machine_users:
+        for user in conn.get_users():
             if user.user_id == user_id:
                 return user
         return False
@@ -68,8 +67,7 @@ class ZkMachine(models.Model):
     def check_username_exists(self, name, conn=False):
         if not conn:
             conn, _ = self.connect()
-        machine_users = conn.get_users()
-        for user in machine_users:
+        for user in conn.get_users():
             if user.name.lower() == name.lower():
                 return user
         return False
@@ -78,94 +76,14 @@ class ZkMachine(models.Model):
         conn, _ = self.connect()
         if conn:
             conn.disconnect()
-            return {'type': 'ir.actions.client', 'tag': 'display_notification',
-                    'params': {'title': 'Connection status', 'message': 'SUCCESS', 'sticky': False, 'type': 'success'}}
-        return {'type'
-cat > /home/odoo/src/user/azk_zkteco_attendance/models/zk_machine.py << 'PYEOF'
-# -*- coding: utf-8 -*-
-from datetime import datetime, time, timedelta
-import logging
-from odoo.exceptions import UserError
-from odoo import api, fields, models, _
-import pytz
-import time as aztime
-from zk import ZK
-
-log = logging.getLogger(__name__)
-
-
-class ZkMachine(models.Model):
-    _name = 'azk.machine'
-    _description = 'AZK Machine'
-
-    name = fields.Char(string='Machine', required=True)
-    machine_ip = fields.Char("Machine IP/DNS", required=True)
-    password = fields.Char('Password', help="Password must be digits.")
-    port_num = fields.Integer(string='Port No', required=True)
-    serial_num = fields.Char("Serial num", readonly=True)
-    timeout = fields.Integer("Connection Timeout", default=10)
-    auto_create_employee = fields.Boolean("Auto create employee", default=False)
-    address_id = fields.Many2one('res.partner', string='Working Address')
-    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.company.id)
-    last_run_status = fields.Boolean('Machine OK', default=False)
-    last_error_msg = fields.Char("Last Error")
-
-    @api.onchange('password')
-    def _onchange_password(self):
-        if self.password:
-            try:
-                int(self.password)
-            except ValueError:
-                raise UserError(_('Password must be digits.'))
-
-    @api.model_create_multi
-    def create(self, vals_list):
-        records = super().create(vals_list)
-        for rec in records:
-            if rec.password:
-                try:
-                    int(rec.password)
-                except ValueError:
-                    raise UserError(_('Password must be digits.'))
-        return records
-
-    def write(self, vals):
-        res = super().write(vals)
-        if 'password' in vals:
-            for rec in self:
-                if rec.password:
-                    try:
-                        int(rec.password)
-                    except ValueError:
-                        raise UserError(_('Password must be digits.'))
-        return res
-
-    def check_user_id_availabilty(self, user_id, conn=False):
-        if not conn:
-            conn, _ = self.connect()
-        machine_users = conn.get_users()
-        for user in machine_users:
-            if user.user_id == user_id:
-                return user
-        return False
-
-    def check_username_exists(self, name, conn=False):
-        if not conn:
-            conn, _ = self.connect()
-        machine_users = conn.get_users()
-        for user in machine_users:
-            if user.name.lower() == name.lower():
-                return user
-        return False
-
-    def test_connection(self):
-        conn, _ = self.connect()
-        if conn:
-            conn.disconnect()
-            return {'type': 'ir.actions.client', 'tag': 'display_notification',
-                    'params': {'title': 'Connection status', 'message': 'SUCCESS', 'sticky': False, 'type': 'success'}}
-        return {'type': 'ir.actions.client', 'tag': 'display_notification',
-                'params': {'title': 'Connection status', 'message': 'Failed: %s' % self.last_error_msg, 'sticky': False, 'type': 'danger'}}
+            msg, typ = "SUCCESS", "success"
+        else:
+            msg, typ = "Failed: %s" % self.last_error_msg, "danger"
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {"title": "Connection status", "message": msg, "sticky": False, "type": typ},
+        }
 
     def connect(self):
         zk, conn = None, None
@@ -195,7 +113,7 @@ class ZkMachine(models.Model):
 
     @api.model
     def cron_download(self):
-        for machine in self.env['azk.machine'].search([]):
+        for machine in self.env["azk.machine"].search([]):
             try:
                 machine.download_attendance()
             except Exception:
@@ -203,9 +121,9 @@ class ZkMachine(models.Model):
 
     def download_attendance(self):
         log.info("Downloading attendance for '%s'", self.name)
-        AZKAttendance = self.env['azk.machine.attendance']
-        HRAttendance = self.env['hr.attendance']
-        local_tz = pytz.timezone(self.env.user.tz or self.env.user.partner_id.tz or 'GMT')
+        AZKAttendance = self.env["azk.machine.attendance"]
+        HRAttendance = self.env["hr.attendance"]
+        local_tz = pytz.timezone(self.env.user.tz or self.env.user.partner_id.tz or "GMT")
         conn = None
         checkins = checkouts = 0
         before = aztime.time()
@@ -217,8 +135,10 @@ class ZkMachine(models.Model):
             machine_users = conn.get_users()
             users_by_id = {u.user_id: u for u in machine_users}
             employees_by_device_id = {
-                e.device_id: e for e in self.env['hr.employee'].search(
-                    [('device_id', 'in', [u.user_id for u in machine_users])])}
+                e.device_id: e for e in self.env["hr.employee"].search(
+                    [("device_id", "in", [u.user_id for u in machine_users])]
+                )
+            }
             today = datetime.today().date()
             lst_attendance = [a for a in lst_attendance if a.timestamp.date() <= today]
             latest = AZKAttendance.search([], order="punching_time desc", limit=1)
@@ -242,78 +162,92 @@ class ZkMachine(models.Model):
                         employees_by_device_id[emp_device_id] = employee
                     if not employee:
                         continue
-                    if AZKAttendance.search([('device_id', '=', emp_device_id), ('punching_time', '=', atten_time)]):
+                    if AZKAttendance.search([("device_id", "=", emp_device_id), ("punching_time", "=", atten_time)]):
                         continue
-                    import_status = 'imported'
+                    import_status = "imported"
                     punch_type, _, _ = ZkMachine.resolve_punchtype(a_rec.timestamp, employee)
-                    prev = HRAttendance.search([('employee_id', '=', employee.id), ('check_out', '=', False)], limit=1)
-                    if punch_type == 'checkin':
-                        has_att = emp_cache.get(employee.id, bool(HRAttendance.search([('employee_id', '=', employee.id)], limit=1)))
+                    prev = HRAttendance.search([("employee_id", "=", employee.id), ("check_out", "=", False)], limit=1)
+                    if punch_type == "checkin":
+                        has_att = emp_cache.get(employee.id, bool(HRAttendance.search([("employee_id", "=", employee.id)], limit=1)))
                         emp_cache[employee.id] = has_att
                         if not has_att:
-                            HRAttendance.create({'employee_id': employee.id, 'check_in': atten_time})
+                            HRAttendance.create({"employee_id": employee.id, "check_in": atten_time})
                             emp_cache[employee.id] = True
                             checkins += 1
                         elif not prev:
-                            if not HRAttendance.search([('employee_id', '=', employee.id), ('check_in', '=', atten_time)], limit=1):
-                                HRAttendance.create({'employee_id': employee.id, 'check_in': atten_time})
+                            if not HRAttendance.search([("employee_id", "=", employee.id), ("check_in", "=", atten_time)], limit=1):
+                                HRAttendance.create({"employee_id": employee.id, "check_in": atten_time})
                             checkins += 1
                         elif prev.check_in.date() < atten_time_ts.date():
-                            prev.write({'check_out': prev.check_in})
-                            HRAttendance.create({'employee_id': employee.id, 'check_in': atten_time})
+                            prev.write({"check_out": prev.check_in})
+                            HRAttendance.create({"employee_id": employee.id, "check_in": atten_time})
                             checkins += 1
-                        elif prev.check_in < atten_time_ts and not HRAttendance.search([('employee_id', '=', employee.id), ('check_out', '=', atten_time)], limit=1):
-                            prev.write({'check_out': atten_time})
+                        elif prev.check_in < atten_time_ts and not HRAttendance.search([("employee_id", "=", employee.id), ("check_out", "=", atten_time)], limit=1):
+                            prev.write({"check_out": atten_time})
                             checkouts += 1
                         else:
-                            import_status = 'skipped'
+                            import_status = "skipped"
                     else:
-                        if prev and prev.check_in < atten_time_ts and not HRAttendance.search([('employee_id', '=', employee.id), ('check_out', '=', atten_time)], limit=1):
-                            prev.write({'check_out': atten_time})
+                        if prev and prev.check_in < atten_time_ts and not HRAttendance.search([("employee_id", "=", employee.id), ("check_out", "=", atten_time)], limit=1):
+                            prev.write({"check_out": atten_time})
                             checkouts += 1
                         else:
-                            import_status = 'skipped'
+                            import_status = "skipped"
                     AZKAttendance.create({
-                        'employee_id': employee.id, 'device_id': emp_device_id,
-                        'attendance_type': str(a_rec.status),
-                        'punch_type': '0' if punch_type == 'checkin' else '1' if punch_type == 'checkout' else None,
-                        'punching_time': atten_time, 'import_status': import_status,
-                        'address_id': self.address_id.id,
+                        "employee_id": employee.id,
+                        "device_id": emp_device_id,
+                        "attendance_type": str(a_rec.status),
+                        "punch_type": "0" if punch_type == "checkin" else "1" if punch_type == "checkout" else None,
+                        "punching_time": atten_time,
+                        "import_status": import_status,
+                        "address_id": self.address_id.id,
                     })
                 except Exception:
-                    log.error("Failed to import attendance '%s'", a_rec, exc_info=True)
+                    log.error("Failed to import attendance record", exc_info=True)
         finally:
             if conn:
                 conn.disconnect()
-        log.info('Done %s: checkins=%s checkouts=%s in %0.2fs', self.name, checkins, checkouts, aztime.time() - before)
-        return {'type': 'ir.actions.client', 'tag': 'display_notification',
-                'params': {'title': 'Download status', 'message': 'Checkins: %s Checkouts: %s' % (checkins, checkouts), 'sticky': False, 'type': 'success'}}
+        log.info("Done %s: checkins=%s checkouts=%s in %0.2fs", self.name, checkins, checkouts, aztime.time() - before)
+        return {
+            "type": "ir.actions.client",
+            "tag": "display_notification",
+            "params": {
+                "title": "Download status",
+                "message": "Checkins: %s Checkouts: %s" % (checkins, checkouts),
+                "sticky": False,
+                "type": "success",
+            },
+        }
 
     @staticmethod
     def resolve_punchtype(punch_time, employee):
         cal = employee.resource_calendar_id.attendance_ids.filtered(
-            lambda a: a.dayofweek == str(punch_time.weekday()))
+            lambda a: a.dayofweek == str(punch_time.weekday())
+        )
         if not cal:
             first_day = employee.resource_calendar_id.attendance_ids[:1].dayofweek
             cal = employee.resource_calendar_id.attendance_ids.filtered(lambda a: a.dayofweek == first_day)
-        closest_rec, punch_type, t_delta = cal[0], 'checkin', None
+        closest_rec, punch_type, t_delta = cal[0], "checkin", None
         for c in cal:
-            hf, mf = int(c.hour_from), int(round((c.hour_from - int(c.hour_from)) * 60))
-            ht, mt = int(c.hour_to), int(round((c.hour_to - int(c.hour_to)) * 60))
+            hf = int(c.hour_from)
+            mf = int(round((c.hour_from - hf) * 60))
+            ht = int(c.hour_to)
+            mt = int(round((c.hour_to - ht) * 60))
             c_from = datetime.combine(punch_time.date(), time(hour=hf, minute=mf))
             c_to = datetime.combine(punch_time.date(), time(hour=ht, minute=mt))
-            df, dt2 = abs(c_from - punch_time), abs(c_to - punch_time)
+            df = abs(c_from - punch_time)
+            dt2 = abs(c_to - punch_time)
             if t_delta is None or df < t_delta:
-                closest_rec, punch_type, t_delta = c, 'checkin', df
+                closest_rec, punch_type, t_delta = c, "checkin", df
             if dt2 < t_delta:
-                closest_rec, punch_type, t_delta = c, 'checkout', dt2
+                closest_rec, punch_type, t_delta = c, "checkout", dt2
         return punch_type, closest_rec, t_delta
 
     def find_or_create_employee(self, user):
-        emp = self.env['hr.employee'].search([('name', '=', user.name)], limit=1)
+        emp = self.env["hr.employee"].search([("name", "=", user.name)], limit=1)
         dev_id = str(user.user_id)
         if emp:
-            emp.write({'device_id': dev_id})
+            emp.write({"device_id": dev_id})
         elif self.auto_create_employee:
-            emp = self.env['hr.employee'].create({'device_id': dev_id, 'name': user.name})
+            emp = self.env["hr.employee"].create({"device_id": dev_id, "name": user.name})
         return emp
