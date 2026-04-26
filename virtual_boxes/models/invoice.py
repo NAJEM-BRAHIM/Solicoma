@@ -29,6 +29,6 @@ class AccountMove(models.Model):
     @api.depends('invoice_line_ids.virtual_box', 'invoice_line_ids.quantity')
     def _compute_totals_virtualbox(self):
         for move in self:
-            lines = move.invoice_line_ids.filtered(lambda l: l.display_type == 'product')
+            lines = move.invoice_line_ids.filtered(lambda l: l.display_type not in ('line_section', 'line_note'))
             move.total_virtual_box = sum(lines.mapped('virtual_box'))
             move.total_quantity = sum(lines.mapped('quantity'))

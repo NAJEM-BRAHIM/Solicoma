@@ -2,13 +2,36 @@
 <odoo>
 
     <template id="report_invoice_document" inherit_id="account.report_invoice_document">
+        <!-- Columna Cajas en cabecera -->
         <xpath expr="//th[@name='th_quantity']" position="after">
             <th name="th_boxes" class="text-end">Cajas</th>
         </xpath>
+        <!-- Columna Cajas por línea -->
         <xpath expr="//td[@name='td_quantity']" position="after">
             <td name="td_boxes" class="text-end">
                 <span t-field="line.virtual_box" />
             </td>
+        </xpath>
+        <!-- Totales de Kg y Cajas en el bloque de totales -->
+        <xpath expr="//div[@id='right-elements']" position="before">
+            <div class="col-auto ms-auto mb-2">
+                <table class="table table-sm" style="width:auto;">
+                    <tbody>
+                        <tr>
+                            <td class="text-end fw-bold pe-3">Total Kg:</td>
+                            <td class="text-end">
+                                <span t-field="o.total_quantity"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-end fw-bold pe-3">Total Cajas:</td>
+                            <td class="text-end">
+                                <span t-field="o.total_virtual_box"/>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </xpath>
     </template>
 

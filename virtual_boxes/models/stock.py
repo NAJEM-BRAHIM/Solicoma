@@ -25,10 +25,21 @@ class StockMoveLine(models.Model):
         readonly=False,
     )
 
-    @api.depends('quantity')
+    @api.depends('quantity', 'move_id.virtual_box', 'move_id.move_line_ids')
     def _compute_virtual_box_line(self):
+        # Agrupar líneas por movimiento
+        moves_done = set()
         for line in self:
-            line.virtual_box = int(line.quantity)
+            move = line.move_id
+            if not move:
+                line.virtual_box = int(line.quantity)
+                continue
+            # La primera línea del movimiento recibe todas las cajas, el resto 0
+            first_line = move.move_line_ids.sorted('id')[:1]
+            if line == first_line:
+                line.virtual_box = move.virtual_box
+            else:
+                line.virtual_box = 0
 
     # Reimplementando
 
@@ -40,7 +51,7 @@ class StockMoveLine(models.Model):
         # Add virtual_box in result
         for line in self:
 
-            if not line.move_id or not line.move_id.virtual_box:
+            if not line.virtual_box:
                 continue
 
             props = self._get_aggregated_properties(move_line=line)
@@ -52,8 +63,8 @@ class StockMoveLine(models.Model):
                 if "virtual_box" not in result[line_key]:
                     result[line_key]["virtual_box"] = 0
 
-                # Add value
-                result[line_key]["virtual_box"] += line.move_id.virtual_box
+                # Sumar cajas de la línea (ya distribuidas proporcionalmente por lote)
+                result[line_key]["virtual_box"] += line.virtual_box
 
         return result
 
