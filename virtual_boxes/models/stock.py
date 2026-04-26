@@ -20,24 +20,37 @@ class StockMoveLine(models.Model):
 
     virtual_box = fields.Integer(
         'Cajas',
-        compute='_compute_virtual_box_line',
         store=True,
         readonly=False,
     )
 
-    @api.depends('move_id.virtual_box', 'move_id.move_line_ids')
-    def _compute_virtual_box_line(self):
-        for line in self:
-            move = line.move_id
-            if not move:
-                line.virtual_box = 0
-                continue
-            # La primera línea del movimiento recibe todas las cajas, el resto 0
-            first_line = move.move_line_ids.sorted('id')[:1]
-            if line == first_line:
-                line.virtual_box = move.virtual_box
-            else:
-                line.virtual_box = 0
+    def write(self, vals):
+        res = super().write(vals)
+        # Cuando se escribe virtual_box en una línea, redistribuir: primera línea = total, resto = 0
+        if 'virtual_box' not in vals:
+            return res
+        # Agrupar por movimiento y recalcular
+        moves = self.mapped('move_id')
+        for move in moves:
+            lines = move.move_line_ids.sorted('id')
+            for i, line in enumerate(lines):
+                correct_val = move.virtual_box if i == 0 else 0
+                if line.virtual_box != correct_val:
+                    super(StockMoveLine, line).write({'virtual_box': correct_val})
+        return res
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super().create(vals_list)
+        # Después de crear, redistribuir cajas: primera línea = total del move, resto = 0
+        moves = records.mapped('move_id')
+        for move in moves:
+            lines = move.move_line_ids.sorted('id')
+            for i, line in enumerate(lines):
+                correct_val = move.virtual_box if i == 0 else 0
+                if line.virtual_box != correct_val:
+                    super(StockMoveLine, line).write({'virtual_box': correct_val})
+        return records
 
     # Reimplementando
 
