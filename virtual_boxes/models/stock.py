@@ -25,14 +25,12 @@ class StockMoveLine(models.Model):
         readonly=False,
     )
 
-    @api.depends('quantity', 'move_id.virtual_box', 'move_id.move_line_ids')
+    @api.depends('move_id.virtual_box', 'move_id.move_line_ids')
     def _compute_virtual_box_line(self):
-        # Agrupar líneas por movimiento
-        moves_done = set()
         for line in self:
             move = line.move_id
             if not move:
-                line.virtual_box = int(line.quantity)
+                line.virtual_box = 0
                 continue
             # La primera línea del movimiento recibe todas las cajas, el resto 0
             first_line = move.move_line_ids.sorted('id')[:1]
@@ -448,20 +446,9 @@ class StockMove(models.Model):
 
     virtual_box = fields.Integer(
         'Cajas',
-        compute='_compute_virtual_box',
         store=True,
         readonly=False,
     )
-
-    @api.depends('quantity', 'product_uom_qty')
-    def _compute_virtual_box(self):
-        for move in self:
-            # Si el movimiento está hecho, usar quantity (cantidad real movida)
-            # Si está pendiente, usar product_uom_qty (cantidad planificada)
-            if move.state == 'done':
-                move.virtual_box = int(move.quantity)
-            else:
-                move.virtual_box = int(move.product_uom_qty)
 
     def _prepare_procurement_values(self):
         res = super(StockMove,self)._prepare_procurement_values()
