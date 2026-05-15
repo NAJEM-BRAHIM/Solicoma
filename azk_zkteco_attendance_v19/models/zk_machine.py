@@ -40,6 +40,18 @@ class ZkMachine(models.Model):
     last_run_status = fields.Boolean('Machine OK', default=False)
     last_error_msg = fields.Char("Last Error")
 
+    lunch_auto_deduction = fields.Boolean(
+        "Auto Deduct Lunch",
+        help="Automatically close attendance and deduct 1 hour for employees "
+             "who checked in before 13:00 but have no check-out.",
+        default=False,
+    )
+    lunch_deduction_hours = fields.Float(
+        "Lunch Deduction Hours",
+        default=1.0,
+        help="Hours to deduct when auto-closing attendance.",
+    )
+
     @api.onchange('password')
     def _onchange_password(self):
         if self.password:
@@ -396,6 +408,26 @@ class ZkMachine(models.Model):
         finally:
             if conn:
                 conn.disconnect()
+
+        if self.lunch_auto_deduction:
+            lunch_hours = self.lunch_deduction_hours or 1.0
+            today_start = datetime.combine(datetime.today().date(), time(0, 0))
+            open_att = HRAttendance.search([
+                ('check_out', '=', False),
+                ('check_in', '>=', today_start),
+                ('check_in', '<', today_start + timedelta(hours=13)),
+            ])
+            for rec in open_att:
+                cal = rec.employee_id.resource_calendar_id
+                if cal and cal.attendance_ids:
+                    total_day_hours = sum(
+                        c.hour_to - c.hour_from for c in cal.attendance_ids
+                    )
+                else:
+                    total_day_hours = 9.0
+                work_hours = total_day_hours - lunch_hours
+                rec.write({'check_out': rec.check_in + timedelta(hours=work_hours)})
+                total_checkouts += 1
 
         log.info(
             'Finish import machine %s -> %s attendance records for %s users. '

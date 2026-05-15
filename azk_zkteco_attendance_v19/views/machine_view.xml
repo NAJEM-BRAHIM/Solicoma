@@ -42,11 +42,20 @@
                                 <field name="serial_num" readonly="1"/>
                             </group>
                             <group>
-                                <!-- v19: readonly expressed as Python bool, not string "1" -->
                                 <field name="last_run_status" readonly="True" widget="toggle_button"/>
                                 <field name="last_error_msg" readonly="True"/>
                             </group>
                         </group>
+                    </group>
+                    <notebook>
+                        <page name="lunch" string="Auto Deduction">
+                            <group>
+                                <field name="lunch_auto_deduction"/>
+                                <field name="lunch_deduction_hours"
+                                       invisible="not lunch_auto_deduction"/>
+                            </group>
+                        </page>
+                    </notebook>
                     </group>
                 </sheet>
             </form>
