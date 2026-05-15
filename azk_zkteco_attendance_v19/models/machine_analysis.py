@@ -68,7 +68,7 @@ class ReportZkDevice(models.Model):
 
     def init(self):
         # v19: tools.drop_view_if_exists signature unchanged
-        tools.drop_view_if_exists(self._cr, 'azk_report_daily_attendance')
+        tools.drop_view_if_exists(self.env.cr, 'azk_report_daily_attendance')
         query = """
             CREATE OR REPLACE VIEW azk_report_daily_attendance AS (
                 SELECT
@@ -92,4 +92,4 @@ class ReportZkDevice(models.Model):
                     z.import_status
             )
         """
-        self._cr.execute(query)
+        self.env.cr.execute(query)
