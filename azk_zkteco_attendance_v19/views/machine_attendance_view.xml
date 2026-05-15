@@ -18,8 +18,7 @@
         <field name="model">hr.attendance</field>
         <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='groupby_check_out']" position="after">
-                <separator/>
+            <xpath expr="//filter[@name='groupby_name']" position="after">
                 <filter name="date" string="Date" context="{'group_by': 'check_in:day'}"/>
             </xpath>
         </field>
