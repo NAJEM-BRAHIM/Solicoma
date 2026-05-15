@@ -40,56 +40,39 @@ class ReportZkDevice(models.Model):
     _order = 'punching_day desc'
 
     name = fields.Many2one('hr.employee', string='Employee')
-    punching_day = fields.Datetime(string='Date')
+    punching_day = fields.Date(string='Date')
+    check_in = fields.Datetime(string='Check In')
+    check_out = fields.Datetime(string='Check Out')
+    worked_hours = fields.Float(string='Worked Hours')
     address_id = fields.Many2one('res.partner', string='Working Address')
 
-    attendance_type = fields.Selection([
-        ('1', 'Finger'),
-        ('15', 'Face'),
-        ('2', 'Type_2'),
-        ('3', 'Password'),
-        ('4', 'Card'),
-    ], string='Category')
-
-    punch_type = fields.Selection([
-        ('0', 'Check In'),
-        ('1', 'Check Out'),
-        ('2', 'Break Out'),
-        ('3', 'Break In'),
-        ('4', 'Overtime In'),
-        ('5', 'Overtime Out'),
-    ], string='Punching Type')
-
-    punching_time = fields.Datetime(string='Punching Time')
-    import_status = fields.Selection([
-        ('imported', 'Imported'),
-        ('skipped', 'Skipped'),
-    ], string='Import Status')
-
     def init(self):
-        # v19: tools.drop_view_if_exists signature unchanged
         tools.drop_view_if_exists(self.env.cr, 'azk_report_daily_attendance')
         query = """
             CREATE OR REPLACE VIEW azk_report_daily_attendance AS (
                 SELECT
-                    min(z.id)           AS id,
-                    z.employee_id       AS name,
-                    z.write_date        AS punching_day,
-                    z.address_id        AS address_id,
-                    z.attendance_type   AS attendance_type,
-                    z.punching_time     AS punching_time,
-                    z.punch_type        AS punch_type,
-                    z.import_status     AS import_status
+                    min(z.id)                                   AS id,
+                    z.employee_id                               AS name,
+                    date(z.punching_time)                       AS punching_day,
+                    min(CASE WHEN z.punch_type = '0'
+                        THEN z.punching_time END)               AS check_in,
+                    max(CASE WHEN z.punch_type = '1'
+                        THEN z.punching_time END)               AS check_out,
+                    CASE
+                        WHEN max(CASE WHEN z.punch_type = '1'
+                            THEN z.punching_time END) IS NOT NULL
+                        THEN EXTRACT(EPOCH FROM (
+                            max(CASE WHEN z.punch_type = '1'
+                                THEN z.punching_time END)
+                            - min(CASE WHEN z.punch_type = '0'
+                                THEN z.punching_time END)
+                        )) / 3600.0
+                        ELSE 0
+                    END                                         AS worked_hours,
+                    z.address_id                                AS address_id
                 FROM azk_machine_attendance z
                     JOIN hr_employee e ON (z.employee_id = e.id)
-                GROUP BY
-                    z.employee_id,
-                    z.write_date,
-                    z.address_id,
-                    z.attendance_type,
-                    z.punch_type,
-                    z.punching_time,
-                    z.import_status
+                GROUP BY z.employee_id, date(z.punching_time), z.address_id
             )
         """
         self.env.cr.execute(query)

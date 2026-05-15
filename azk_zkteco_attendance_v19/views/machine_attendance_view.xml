@@ -33,17 +33,14 @@
                 <filter string="My Attendance" name="my_attendance"
                         domain="[('name.user_id.id', '=', uid)]"/>
                 <filter name="today" string="Today"
-                        domain="[('punching_time', '&gt;=', datetime.datetime.now().replace(hour=0, minute=0, second=0)),
-                                  ('punching_time', '&lt;=', datetime.datetime.now().replace(hour=23, minute=59, second=59))]"/>
+                        domain="[('check_in', '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d'))]"/>
                 <filter string="Current Month" name="month"
-                        domain="[('punching_time', '&gt;=', datetime.datetime.now().strftime('%Y-%m-01'))]"/>
+                        domain="[('check_in', '&gt;=', datetime.datetime.now().strftime('%Y-%m-01'))]"/>
                 <separator/>
                 <field name="name" string="Name"/>
                 <group name="Attendance group by">
                     <filter name="Employee"     string="Employee"      context="{'group_by': 'name'}"/>
-                    <filter name="Category"     string="Category"      context="{'group_by': 'attendance_type'}"/>
-                    <filter name="Punch type"   string="Punching Type" context="{'group_by': 'punch_type'}"/>
-                    <filter name="Punch time"   string="Punching Time" context="{'group_by': 'punching_time'}"/>
+                    <filter name="Date"         string="Date"          context="{'group_by': 'punching_day'}"/>
                 </group>
             </search>
         </field>
@@ -54,14 +51,13 @@
         <field name="name">azk.report.daily.attendance.list</field>
         <field name="model">azk.report.daily.attendance</field>
         <field name="arch" type="xml">
-            <list string="Attendance" create="false" delete="false" default_order="punching_time desc">
+            <list string="Attendance" create="false" delete="false" default_order="punching_day desc">
                 <field name="punching_day"/>
                 <field name="name"/>
-                <field name="punch_type"/>
-                <field name="attendance_type"/>
-                <field name="punching_time"/>
+                <field name="check_in"/>
+                <field name="check_out"/>
+                <field name="worked_hours" sum="Total"/>
                 <field name="address_id"/>
-                <field name="import_status"/>
             </list>
         </field>
     </record>
