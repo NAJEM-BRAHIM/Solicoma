@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- BotÃ³n "Usa Caja Virtual" en formulario de producto (zona de opciones) -->
+    <!-- Botón "Usa Caja Virtual" en formulario de producto (zona de opciones) -->
     <record id="product_template_virtualbox_form" model="ir.ui.view">
         <field name="name">product.template.virtualbox.form</field>
         <field name="model">product.template</field>
@@ -15,7 +15,7 @@
         </field>
     </record>
 
-    <!-- Columna Cajas en la lista de productos (Inventario â Productos) -->
+    <!-- Columna Cajas en la lista de productos (Inventario → Productos) -->
     <record id="product_product_stock_virtualbox" model="ir.ui.view">
         <field name="name">product.product.stock.virtualbox</field>
         <field name="model">product.product</field>
