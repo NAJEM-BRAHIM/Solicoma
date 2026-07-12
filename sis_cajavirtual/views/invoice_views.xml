@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Campo Cajas en líneas de factura -->
+    <record id="account_move_virtualbox_form" model="ir.ui.view">
+        <field name="name">account.move.virtualbox.form</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@id='invoice_tab']/field[@name='invoice_line_ids']/list/field[@name='product_uom_id']" position="after">
+                <field name="virtual_box" string="Cajas" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
