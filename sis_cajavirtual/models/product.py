@@ -2,6 +2,15 @@
 from odoo import api, fields, models
 
 
+class ProductTemplate(models.Model):
+    _inherit = 'product.template'
+
+    use_virtual_box = fields.Boolean(
+        string='Usa Caja Virtual',
+        help='Marcar si este producto se gestiona por cajas virtuales.',
+    )
+
+
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
