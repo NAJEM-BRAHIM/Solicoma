@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <record id="ma_rule_cout_employeur" model="hr.salary.rule">
+            <field name="name">Coût Total Employeur</field>
+            <field name="code">COUT_EMP</field>
+            <field name="sequence">700</field>
+            <field name="category_id" ref="ma_rule_category_patronal"/>
+            <field name="condition_select">none</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+cnss_pat = CNSS_PAT or 0
+amo_pat = AMO_PAT or 0
+alloc = ALLOC_FAM or 0
+tfp = TFP or 0
+# CIMR_PAT et MUTUELLE_PAT sont conditionnels: utiliser localdict.get pour éviter NameError
+cimr_pat = localdict.get('CIMR_PAT', 0)
+mut_pat = localdict.get('MUTUELLE_PAT', 0)
+charges_pat = cnss_pat + amo_pat + alloc + tfp + cimr_pat + mut_pat
+result = SBG + charges_pat
+            </field>
+            <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
+        </record>
+
+    </data>
+</odoo>
