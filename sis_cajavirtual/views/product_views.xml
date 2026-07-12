@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Botón "Usa Caja Virtual" en formulario de producto (zona de opciones) -->
+    <record id="product_template_virtualbox_form" model="ir.ui.view">
+        <field name="name">product.template.virtualbox.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='options']" position="inside">
+                <span name="virtual_box_option" class="d-inline-flex gap-2">
+                    <field name="use_virtual_box"/>
+                    <label for="use_virtual_box"/>
+                </span>
+            </xpath>
+        </field>
+    </record>
+
     <!-- Columna Cajas en la lista de productos (Inventario → Productos) -->
     <record id="product_product_stock_virtualbox" model="ir.ui.view">
         <field name="name">product.product.stock.virtualbox</field>
