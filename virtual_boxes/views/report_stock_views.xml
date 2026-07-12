@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Albarán - tabla de movimientos no validados (state != 'done').
+        Itera sobre stock.move: un registro por producto, sin duplicar por lote.
+    -->
+    <template id="report_delivery_virtual_boxes" inherit_id="stock.report_delivery_document">
+        <!-- Cabecera: después de "Delivered" -->
+        <xpath expr="//th[@name='th_sm_quantity']" position="after">
+            <th name="th_sm_boxes" class="text-end">Nº Cajas</th>
+        </xpath>
+        <!-- Celda de datos: después del td que contiene format_number(move.quantity) -->
+        <xpath expr="//table[@name='stock_move_table']//td[.//span[@t-out='format_number(move.quantity)']]" position="after">
+            <td class="text-end">
+                <span t-if="move.num_boxes" t-out="move.num_boxes"/>
+            </td>
+        </xpath>
+        <!-- Totales albarán no validado (4 columnas: product, ordered, delivered, boxes) -->
+        <xpath expr="//table[@name='stock_move_table']" position="inside">
+            <tfoot>
+                <tr style="border-top: 2px solid #dee2e6;">
+                    <td class="fw-bold" colspan="2">Total</td>
+                    <td class="text-end fw-bold">
+                        <span t-out="sum(m.product_uom_qty for m in o.move_ids if m.state != 'cancel')"/>
+                    </td>
+                    <td class="text-end fw-bold">
+                        <span t-out="sum(m.num_boxes for m in o.move_ids if m.state != 'cancel')"/>
+                    </td>
+                </tr>
+            </tfoot>
+        </xpath>
+        <!-- Albarán validado: cabecera de la tabla de líneas agrupadas -->
+        <xpath expr="//th[@name='th_sml_quantity']" position="after">
+            <th name="th_sml_boxes" class="text-end">Nº Cajas</th>
+        </xpath>
+        <!-- Totales albarán validado (stock_move_line_table) -->
+        <xpath expr="//table[@name='stock_move_line_table']//tbody" position="after">
+            <tfoot>
+                <tr style="border-top: 2px solid #dee2e6;">
+                    <td class="fw-bold" colspan="2">Total</td>
+                    <td class="text-end fw-bold">
+                        <span t-out="sum(m.product_uom_qty for m in o.move_ids if m.state == 'done')"/>
+                    </td>
+                    <td class="text-end fw-bold">
+                        <span t-out="sum(m.num_boxes for m in o.move_ids if m.state == 'done')"/>
+                    </td>
+                </tr>
+            </tfoot>
+        </xpath>
+    </template>
+
+    <!--
+        Albarán validado - líneas agrupadas por producto (sin lotes impresos).
+        num_boxes viene del diccionario agregado sobreescrito en stock_move_line.py.
+    -->
+    <template id="stock_report_delivery_aggregated_move_lines_virtual_boxes"
+              inherit_id="stock.stock_report_delivery_aggregated_move_lines">
+        <xpath expr="//td[@name='move_line_aggregated_quantity']" position="after">
+            <td class="text-end" name="move_line_aggregated_boxes">
+                <span t-if="aggregated_lines[line].get('num_boxes')"
+                      t-out="aggregated_lines[line]['num_boxes']"/>
+            </td>
+        </xpath>
+    </template>
+
+    <!--
+        Albarán validado - líneas por lote/número de serie.
+        Se añade celda vacía para mantener la alineación de columnas.
+    -->
+    <template id="stock_report_delivery_has_serial_virtual_boxes"
+              inherit_id="stock.stock_report_delivery_has_serial_move_line">
+        <xpath expr="//td[@name='move_line_lot_quantity']" position="after">
+            <td class="text-end" name="move_line_serial_boxes"/>
+        </xpath>
+    </template>
+</odoo>
