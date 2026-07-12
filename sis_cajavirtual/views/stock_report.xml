@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Columna Cajas en informe de albarán (Delivery Slip) -->
+    <template id="report_delivery_document_virtualbox" inherit_id="stock.report_delivery_document">
+        <!-- Cabecera: añadir "Cajas" después de "Delivered" -->
+        <xpath expr="//table[@name='stock_move_table']/thead/tr/th[@name='th_sm_quantity']" position="after">
+            <th name="th_sm_boxes"><strong>Cajas</strong></th>
+        </xpath>
+        <!-- Línea: añadir celda de cajas en el cuerpo de la tabla -->
+        <xpath expr="//table[@name='stock_move_table']/tbody/tr/td[hasclass('o_td_quantity')][last()]" position="after">
+            <td class="text-end">
+                <span t-if="move.virtual_box" t-out="move.virtual_box"/>
+            </td>
+        </xpath>
+    </template>
+
+    <!-- Columna Cajas en informe de líneas de movimiento agregadas -->
+    <template id="stock_report_delivery_aggregated_virtualbox" inherit_id="stock.stock_report_delivery_aggregated_move_lines">
+        <xpath expr="//tr/td[3]" position="after">
+            <td>
+                <span t-esc="aggregated_lines[line].get('virtual_box', 0)"
+                      t-options="{'widget': 'float', 'decimal_precision': 'Product Unit of Measure'}"/>
+            </td>
+        </xpath>
+    </template>
+</odoo>

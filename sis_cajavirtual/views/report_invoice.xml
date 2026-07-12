@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Columna Cajas en informe PDF de factura -->
+    <template id="report_invoice_document_virtualbox" inherit_id="account.report_invoice_document">
+        <!-- Cabecera: añadir "Cajas" después de "Quantity" -->
+        <xpath expr="//th[@name='th_quantity']" position="after">
+            <th name="th_boxes" class="text-end">Cajas</th>
+        </xpath>
+        <!-- Línea: añadir celda de cajas después de la cantidad -->
+        <xpath expr="//td[@name='td_quantity']" position="after">
+            <td name="td_boxes" class="text-end">
+                <span t-field="line.virtual_box"/>
+            </td>
+        </xpath>
+    </template>
+</odoo>
