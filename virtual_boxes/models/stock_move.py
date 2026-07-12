@@ -31,7 +31,7 @@ class StockMove(models.Model):
     def _update_quant_num_boxes(self):
         """Actualiza Nº Cajas en stock.quant por lote al validar el movimiento."""
         StockQuant = self.env['stock.quant'].sudo()
-        for move in self.filtered(lambda m: m.state == 'done' and m.product_id.use_virtual_box):
+        for move in self.filtered(lambda m: m.product_id.use_virtual_box):
             for ml in move.move_line_ids.filtered(lambda l: l.num_boxes):
                 # Sumar cajas en ubicación destino (interna)
                 if ml.location_dest_id.usage == 'internal':

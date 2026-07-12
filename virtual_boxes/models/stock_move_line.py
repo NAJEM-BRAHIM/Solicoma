@@ -19,7 +19,7 @@ class StockMoveLine(models.Model):
         for line in self:
             move = line.move_id
             if move.num_boxes and move.product_uom_qty and line.product_id.use_virtual_box:
-                ratio = (line.quantity or 0) / move.product_uom_qty
+                ratio = (line.quantity or 0) / move.product_uom_qty if move.product_uom_qty else 0
                 line.num_boxes = round(move.num_boxes * ratio)
             else:
                 line.num_boxes = 0

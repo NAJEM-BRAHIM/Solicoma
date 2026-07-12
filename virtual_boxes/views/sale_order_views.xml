@@ -44,7 +44,7 @@
                 <field name="use_virtual_box" column_invisible="True"/>
                 <field name="num_boxes" string="Nº Cajas"
                        invisible="not use_virtual_box"
-                       readonly="state == 'done' and is_locked"/>
+                       readonly="move_id.state == 'done' and is_locked"/>
             </xpath>
         </field>
     </record>

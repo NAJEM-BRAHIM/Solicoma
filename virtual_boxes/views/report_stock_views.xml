@@ -9,8 +9,8 @@
         <xpath expr="//th[@name='th_sm_quantity']" position="after">
             <th name="th_sm_boxes" class="text-end">Nº Cajas</th>
         </xpath>
-        <!-- Celda de datos: después del td que contiene format_number(move.quantity) -->
-        <xpath expr="//table[@name='stock_move_table']//td[.//span[@t-out='format_number(move.quantity)']]" position="after">
+        <!-- Celda de datos: después de la última td con clase o_td_quantity (columna "Delivered") -->
+        <xpath expr="//table[@name='stock_move_table']//tbody/tr/td[hasclass('o_td_quantity')][last()]" position="after">
             <td class="text-end">
                 <span t-if="move.num_boxes" t-out="move.num_boxes"/>
             </td>

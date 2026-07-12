@@ -9,7 +9,7 @@ class AccountMoveLine(models.Model):
         string='Nº Cajas',
         compute='_compute_num_boxes',
         store=False,
-        readonly=False,
+        readonly=True,
     )
 
     @api.depends('sale_line_ids.num_boxes')
