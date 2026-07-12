@@ -1,72 +1,29 @@
-RPC_ERROR
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- BotÃ³n "Usa Caja Virtual" en formulario de producto (zona de opciones) -->
+    <record id="product_template_virtualbox_form" model="ir.ui.view">
+        <field name="name">product.template.virtualbox.form</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='options']" position="inside">
+                <span name="virtual_box_option" class="d-inline-flex gap-2">
+                    <field name="use_virtual_box"/>
+                    <label for="use_virtual_box"/>
+                </span>
+            </xpath>
+        </field>
+    </record>
 
-Odoo Server Error
-
-Occured on solicoma-paie-34791501.dev.odoo.com on model ir.module.module on 2026-07-12 13:34:47 GMT
-
-Traceback (most recent call last):
-  File "/home/odoo/src/odoo/odoo/http.py", line 2329, in _serve_db
-    return service_model.retrying(serve_func, env=self.env)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/odoo/src/odoo/odoo/service/model.py", line 188, in retrying
-    result = func()
-             ^^^^^^
-  File "/home/odoo/src/odoo/odoo/http.py", line 2384, in _serve_ir_http
-    response = self.dispatcher.dispatch(rule.endpoint, args)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/odoo/src/odoo/odoo/http.py", line 2599, in dispatch
-    result = self.request.registry['ir.http']._dispatch(endpoint)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/odoo/src/odoo/odoo/addons/base/models/ir_http.py", line 353, in _dispatch
-    result = endpoint(**request.params)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/odoo/src/odoo/odoo/http.py", line 838, in route_wrapper
-    result = endpoint(self, *args, **params_ok)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/odoo/src/odoo/addons/web/controllers/dataset.py", line 38, in call_button
-    action = call_kw(request.env[model], method, args, kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/odoo/src/odoo/odoo/service/model.py", line 97, in call_kw
-    result = method(recs, *args, **kwargs)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/odoo/src/odoo/odoo/addons/base/models/ir_module.py", line 72, in check_and_log
-    return method(self, *args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/odoo/src/odoo/odoo/addons/base/models/ir_module.py", line 701, in button_immediate_upgrade
-    return self._button_immediate_function(self.env.registry[self._name].button_upgrade)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/odoo/src/odoo/odoo/addons/base/models/ir_module.py", line 638, in _button_immediate_function
-    registry = modules.registry.Registry.new(self.env.cr.dbname, update_module=True)
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/odoo/src/odoo/odoo/tools/func.py", line 88, in locked
-    return func(inst, *args, **kwargs)
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/odoo/src/odoo/odoo/orm/registry.py", line 183, in new
-    load_modules(
-  File "/home/odoo/src/odoo/odoo/modules/loading.py", line 464, in load_modules
-    load_module_graph(
-  File "/home/odoo/src/odoo/odoo/modules/loading.py", line 224, in load_module_graph
-    load_data(env, idref, mode, kind='data', package=package)
-  File "/home/odoo/src/odoo/odoo/modules/loading.py", line 59, in load_data
-    convert_file(env, package.name, filename, idref, mode, noupdate=kind == 'demo')
-  File "/home/odoo/src/odoo/odoo/tools/convert.py", line 693, in convert_file
-    convert_xml_import(env, module, fp, idref, mode, noupdate)
-  File "/home/odoo/src/odoo/odoo/tools/convert.py", line 771, in convert_xml_import
-    doc = etree.parse(xmlfile)
-          ^^^^^^^^^^^^^^^^^^^^
-  File "src/lxml/etree.pyx", line 3570, in lxml.etree.parse
-  File "src/lxml/parser.pxi", line 1973, in lxml.etree._parseDocument
-  File "src/lxml/parser.pxi", line 1993, in lxml.etree._parseFilelikeDocument
-  File "src/lxml/parser.pxi", line 1887, in lxml.etree._parseDocFromFilelike
-  File "src/lxml/parser.pxi", line 1224, in lxml.etree._BaseParser._parseDocFromFilelike
-  File "src/lxml/parser.pxi", line 633, in lxml.etree._ParserContext._handleParseResultDoc
-  File "src/lxml/parser.pxi", line 743, in lxml.etree._handleParseResult
-  File "src/lxml/parser.pxi", line 672, in lxml.etree._raiseParseError
-  File "/home/odoo/src/user/sis_cajavirtual/views/product_views.xml", line 17
-lxml.etree.XMLSyntaxError: Premature end of data in tag odoo line 2, line 17, column 1
-
-The above server error caused the following client error:
-RPC_ERROR: Odoo Server Error
-    RPC_ERROR
-        at makeErrorFromResponse (https://solicoma-paie-34791501.dev.odoo.com/web/assets/a382cbe/web.assets_web.min.js:3185:165)
-        at XMLHttpRequest.<anonymous> (https://solicoma-paie-34791501.dev.odoo.com/web/assets/a382cbe/web.assets_web.min.js:3192:13)
+    <!-- Columna Cajas en la lista de productos (Inventario â Productos) -->
+    <record id="product_product_stock_virtualbox" model="ir.ui.view">
+        <field name="name">product.product.stock.virtualbox</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="stock.product_product_stock_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='qty_available']" position="after">
+                <field name="virtual_box" string="Cajas" optional="show" sum="Total Cajas"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
