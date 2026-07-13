@@ -1,7 +1,7 @@
 {
     'name': 'Virtual Boxes',
     'summary': 'Número de cajas por línea en pedidos de venta y albaranes',
-    'version': '19.0.1.0.1',
+    'version': '19.0.1.0.2',
     'category': 'Inventory',
     'author': 'Custom',
     'license': 'LGPL-3',
