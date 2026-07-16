@@ -195,6 +195,24 @@ class ZkMachine(models.Model):
                     exc_info=True,
                 )
 
+    def _maybe_deduct_lunch(self, check_in_dt, check_out_dt):
+        """
+        Si lunch_auto_deduction está activo y el empleado estuvo presente durante
+        la ventana de comida (13:00 UTC ≈ 14:00 hora local), resta lunch_deduction_hours
+        al check_out real importado desde la máquina.
+
+        Solo actúa sobre check-outs REALES importados de la máquina; nunca crea
+        check-outs automáticos para empleados que no marcaron salida.
+        """
+        if not self.lunch_auto_deduction:
+            return check_out_dt
+        lunch_hours = self.lunch_deduction_hours or 1.0
+        # 13:00 UTC ≈ 14:00 hora de Marruecos (UTC+1 verano)
+        noon_utc = check_in_dt.replace(hour=13, minute=0, second=0, microsecond=0)
+        if check_in_dt < noon_utc < check_out_dt:
+            return check_out_dt - timedelta(hours=lunch_hours)
+        return check_out_dt
+
     def download_attendance(self):
         """
         Downloads attendance from the ZK Machine, stores records locally and
@@ -345,7 +363,10 @@ class ZkMachine(models.Model):
                                             ('check_out', '=', atten_time),
                                         ], limit=1)
                                     ):
-                                        previous_check_in.write({'check_out': atten_time})
+                                        checkout_dt = self._maybe_deduct_lunch(
+                                            previous_check_in.check_in, atten_time_ts
+                                        )
+                                        previous_check_in.write({'check_out': checkout_dt})
                                         total_checkouts += 1
                                     else:
                                         import_status = 'skipped'
@@ -358,7 +379,10 @@ class ZkMachine(models.Model):
                                             ('check_out', '=', atten_time),
                                         ], limit=1)
                                     ):
-                                        previous_check_in.write({'check_out': atten_time})
+                                        checkout_dt = self._maybe_deduct_lunch(
+                                            previous_check_in.check_in, atten_time_ts
+                                        )
+                                        previous_check_in.write({'check_out': checkout_dt})
                                         total_checkouts += 1
                                     else:
                                         import_status = 'skipped'
@@ -408,51 +432,6 @@ class ZkMachine(models.Model):
         finally:
             if conn:
                 conn.disconnect()
-
-        if self.lunch_auto_deduction:
-            lunch_hours = self.lunch_deduction_hours or 1.0
-            now_utc = datetime.utcnow()
-            # Buscar asistencias abiertas de los últimos 2 días
-            two_days_ago = datetime.combine(
-                (now_utc - timedelta(days=2)).date(), time(0, 0)
-            )
-            open_att = HRAttendance.search([
-                ('check_out', '=', False),
-                ('check_in', '>=', two_days_ago),
-                # Solo empleados que entraron antes de las 14h (hora UTC)
-                # para garantizar que pasaron la hora de comida
-            ])
-            for rec in open_att:
-                # Solo procesar si el check-in fue antes de las 14h locales (13h UTC aprox.)
-                if rec.check_in.hour >= 13:
-                    continue
-
-                cal = rec.employee_id.resource_calendar_id
-                if cal and cal.attendance_ids:
-                    # Filtrar solo los tramos del día de la semana del check-in
-                    day_slots = cal.attendance_ids.filtered(
-                        lambda a: a.dayofweek == str(rec.check_in.weekday())
-                    )
-                    if day_slots:
-                        total_day_hours = sum(
-                            c.hour_to - c.hour_from for c in day_slots
-                        )
-                    else:
-                        total_day_hours = 9.0
-                else:
-                    total_day_hours = 9.0
-
-                work_hours = total_day_hours - lunch_hours
-                expected_checkout = rec.check_in + timedelta(hours=work_hours)
-
-                # Solo cerrar la asistencia si el turno ya debería haber terminado
-                if now_utc >= expected_checkout:
-                    rec.write({'check_out': expected_checkout})
-                    total_checkouts += 1
-                    log.info(
-                        "lunch_auto_deduction: check-out automático para %s → %s",
-                        rec.employee_id.name, expected_checkout,
-                    )
 
         log.info(
             'Finish import machine %s -> %s attendance records for %s users. '
