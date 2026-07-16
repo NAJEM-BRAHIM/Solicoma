@@ -1,17 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Customize Attendance Report: add worked_hours as measure -->
-    <record id="inherited_view_attendance_list" model="ir.ui.view">
-        <field name="name">inherited_hr.attendance.list</field>
-        <field name="model">hr.attendance</field>
-        <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
-        <field name="arch" type="xml">
-            <!-- v19: <tree> inside xpath → <list>; 'type="measure"' still valid for optional/measure cols -->
-            <xpath expr="//list" position="inside">
-                <field name="worked_hours" type="measure"/>
-            </xpath>
-        </field>
-    </record>
+    <!-- v19: worked_hours ya está incluido en view_attendance_tree de Odoo 19,
+         no se añade de nuevo para evitar campo duplicado -->
 
     <record id="inherited_hr_attendance_view_filter" model="ir.ui.view">
         <field name="name">inherited_hr_attendance_view_filter</field>

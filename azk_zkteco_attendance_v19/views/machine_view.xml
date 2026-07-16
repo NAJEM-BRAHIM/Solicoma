@@ -110,7 +110,7 @@
 
     <record id="action_delete_machine_user" model="ir.actions.server">
         <field name="name">Delete User On Machine</field>
-        <field name="model_id" ref="model_hr_employee"/>
+        <field name="model_id" ref="hr.model_hr_employee"/>
         <field name="binding_model_id" ref="hr.model_hr_employee"/>
         <field name="binding_view_types">form</field>
         <field name="state">code</field>
@@ -121,7 +121,7 @@
 
     <record id="action_create_machine_user" model="ir.actions.server">
         <field name="name">Create User On Machine</field>
-        <field name="model_id" ref="model_hr_employee"/>
+        <field name="model_id" ref="hr.model_hr_employee"/>
         <field name="binding_model_id" ref="hr.model_hr_employee"/>
         <!-- v19: binding_view_types uses 'list' instead of 'tree' -->
         <field name="binding_view_types">list,form</field>
