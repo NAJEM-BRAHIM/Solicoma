@@ -420,9 +420,17 @@ class ZkMachine(models.Model):
             for rec in open_att:
                 cal = rec.employee_id.resource_calendar_id
                 if cal and cal.attendance_ids:
-                    total_day_hours = sum(
-                        c.hour_to - c.hour_from for c in cal.attendance_ids
+                    # Filtrar solo los tramos del día de la semana del check-in
+                    # para evitar sumar horas de toda la semana
+                    day_slots = cal.attendance_ids.filtered(
+                        lambda a: a.dayofweek == str(rec.check_in.weekday())
                     )
+                    if day_slots:
+                        total_day_hours = sum(
+                            c.hour_to - c.hour_from for c in day_slots
+                        )
+                    else:
+                        total_day_hours = 9.0
                 else:
                     total_day_hours = 9.0
                 work_hours = total_day_hours - lunch_hours
