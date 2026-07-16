@@ -411,17 +411,25 @@ class ZkMachine(models.Model):
 
         if self.lunch_auto_deduction:
             lunch_hours = self.lunch_deduction_hours or 1.0
-            today_start = datetime.combine(datetime.today().date(), time(0, 0))
+            now_utc = datetime.utcnow()
+            # Buscar asistencias abiertas de los últimos 2 días
+            two_days_ago = datetime.combine(
+                (now_utc - timedelta(days=2)).date(), time(0, 0)
+            )
             open_att = HRAttendance.search([
                 ('check_out', '=', False),
-                ('check_in', '>=', today_start),
-                ('check_in', '<', today_start + timedelta(hours=13)),
+                ('check_in', '>=', two_days_ago),
+                # Solo empleados que entraron antes de las 14h (hora UTC)
+                # para garantizar que pasaron la hora de comida
             ])
             for rec in open_att:
+                # Solo procesar si el check-in fue antes de las 14h locales (13h UTC aprox.)
+                if rec.check_in.hour >= 13:
+                    continue
+
                 cal = rec.employee_id.resource_calendar_id
                 if cal and cal.attendance_ids:
                     # Filtrar solo los tramos del día de la semana del check-in
-                    # para evitar sumar horas de toda la semana
                     day_slots = cal.attendance_ids.filtered(
                         lambda a: a.dayofweek == str(rec.check_in.weekday())
                     )
@@ -433,9 +441,18 @@ class ZkMachine(models.Model):
                         total_day_hours = 9.0
                 else:
                     total_day_hours = 9.0
+
                 work_hours = total_day_hours - lunch_hours
-                rec.write({'check_out': rec.check_in + timedelta(hours=work_hours)})
-                total_checkouts += 1
+                expected_checkout = rec.check_in + timedelta(hours=work_hours)
+
+                # Solo cerrar la asistencia si el turno ya debería haber terminado
+                if now_utc >= expected_checkout:
+                    rec.write({'check_out': expected_checkout})
+                    total_checkouts += 1
+                    log.info(
+                        "lunch_auto_deduction: check-out automático para %s → %s",
+                        rec.employee_id.name, expected_checkout,
+                    )
 
         log.info(
             'Finish import machine %s -> %s attendance records for %s users. '
