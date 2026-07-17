@@ -40,17 +40,6 @@ class ZkMachine(models.Model):
     last_run_status = fields.Boolean('Machine OK', default=False)
     last_error_msg = fields.Char("Last Error")
 
-    lunch_auto_deduction = fields.Boolean(
-        "Auto Deduct Lunch",
-        help="Automatically close attendance and deduct 1 hour for employees "
-             "who checked in before 13:00 but have no check-out.",
-        default=False,
-    )
-    lunch_deduction_hours = fields.Float(
-        "Lunch Deduction Hours",
-        default=1.0,
-        help="Hours to deduct when auto-closing attendance.",
-    )
 
     @api.onchange('password')
     def _onchange_password(self):
@@ -194,35 +183,6 @@ class ZkMachine(models.Model):
                     machine.name, machine.machine_ip, machine.port_num,
                     exc_info=True,
                 )
-
-    def _maybe_deduct_lunch(self, check_in_dt, check_out_dt):
-        """
-        Si lunch_auto_deduction está activo y el empleado estuvo presente durante
-        la ventana de comida (13:00 UTC ≈ 14:00 hora local), resta lunch_deduction_hours
-        al check_out real importado desde la máquina.
-
-        Solo actúa sobre check-outs REALES importados de la máquina; nunca crea
-        check-outs automáticos para empleados que no marcaron salida.
-        """
-        log.warning(
-            "LUNCH_DBG _maybe_deduct_lunch: ci=%s co=%s lad=%s ldh=%s",
-            check_in_dt, check_out_dt,
-            self.lunch_auto_deduction, self.lunch_deduction_hours,
-        )
-        if not self.lunch_auto_deduction:
-            log.warning("LUNCH_DBG lunch_auto_deduction=False → sin descuento")
-            return check_out_dt
-        lunch_hours = self.lunch_deduction_hours or 1.0
-        # 13:00 UTC ≈ 14:00 hora de Marruecos (UTC+1 verano)
-        noon_utc = check_in_dt.replace(hour=13, minute=0, second=0, microsecond=0)
-        log.warning("LUNCH_DBG noon_utc=%s condición: %s < %s < %s → %s",
-                    noon_utc, check_in_dt, noon_utc, check_out_dt,
-                    check_in_dt < noon_utc < check_out_dt)
-        if check_in_dt < noon_utc < check_out_dt:
-            result = check_out_dt - timedelta(hours=lunch_hours)
-            log.warning("LUNCH_DBG deduciendo → %s", result)
-            return result
-        return check_out_dt
 
     def download_attendance(self):
         """
@@ -374,10 +334,7 @@ class ZkMachine(models.Model):
                                             ('check_out', '=', atten_time),
                                         ], limit=1)
                                     ):
-                                        checkout_dt = self._maybe_deduct_lunch(
-                                            previous_check_in.check_in, atten_time_ts
-                                        )
-                                        previous_check_in.write({'check_out': checkout_dt})
+                                        previous_check_in.write({'check_out': atten_time})
                                         total_checkouts += 1
                                     else:
                                         import_status = 'skipped'
@@ -390,10 +347,7 @@ class ZkMachine(models.Model):
                                             ('check_out', '=', atten_time),
                                         ], limit=1)
                                     ):
-                                        checkout_dt = self._maybe_deduct_lunch(
-                                            previous_check_in.check_in, atten_time_ts
-                                        )
-                                        previous_check_in.write({'check_out': checkout_dt})
+                                        previous_check_in.write({'check_out': atten_time})
                                         total_checkouts += 1
                                     else:
                                         import_status = 'skipped'

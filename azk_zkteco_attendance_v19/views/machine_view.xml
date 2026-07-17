@@ -47,15 +47,6 @@
                             </group>
                         </group>
                     </group>
-                    <notebook>
-                        <page name="lunch" string="Auto Deduction">
-                            <group>
-                                <field name="lunch_auto_deduction"/>
-                                <field name="lunch_deduction_hours"
-                                       invisible="not lunch_auto_deduction"/>
-                            </group>
-                        </page>
-                    </notebook>
                 </sheet>
             </form>
         </field>
