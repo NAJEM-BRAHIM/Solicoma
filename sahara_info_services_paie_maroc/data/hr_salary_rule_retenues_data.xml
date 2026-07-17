@@ -59,8 +59,12 @@
             <field name="condition_python">result = 'ABS_NP' in inputs and inputs['ABS_NP'].amount > 0</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-wage = payslip.version_id.wage if payslip.version_id else 0
-salaire_journalier = wage / 26.0 if wage else 0
+v = payslip.version_id
+if v and v.wage_type == 'hourly':
+    salaire_journalier = v.hourly_wage * 8
+else:
+    wage = v.wage if v else 0
+    salaire_journalier = wage / 26.0 if wage else 0
 result = -(inputs['ABS_NP'].amount * salaire_journalier)
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>

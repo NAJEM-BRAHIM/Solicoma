@@ -10,7 +10,20 @@
             <field name="category_id" ref="hr_payroll.BASIC"/>
             <field name="condition_select">none</field>
             <field name="amount_select">code</field>
-            <field name="amount_python_compute">result = payslip.version_id.wage if payslip.version_id else 0</field>
+            <field name="amount_python_compute">
+v = payslip.version_id
+if not v:
+    result = 0
+elif v.wage_type == 'hourly':
+    hours = sum(
+        line.number_of_hours
+        for line in payslip.worked_days_line_ids
+        if line.code == 'WORK100'
+    )
+    result = v.hourly_wage * hours
+else:
+    result = v.wage
+            </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
         </record>
 
@@ -43,8 +56,12 @@ else:
             <field name="condition_python">result = 'HS25' in inputs and inputs['HS25'].amount > 0</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-wage = payslip.version_id.wage if payslip.version_id else 0
-taux_horaire = wage / 191 if wage else 0
+v = payslip.version_id
+if v and v.wage_type == 'hourly':
+    taux_horaire = v.hourly_wage
+else:
+    wage = v.wage if v else 0
+    taux_horaire = wage / 191 if wage else 0
 result = inputs['HS25'].amount * taux_horaire * 1.25
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
@@ -59,8 +76,12 @@ result = inputs['HS25'].amount * taux_horaire * 1.25
             <field name="condition_python">result = 'HS50' in inputs and inputs['HS50'].amount > 0</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-wage = payslip.version_id.wage if payslip.version_id else 0
-taux_horaire = wage / 191 if wage else 0
+v = payslip.version_id
+if v and v.wage_type == 'hourly':
+    taux_horaire = v.hourly_wage
+else:
+    wage = v.wage if v else 0
+    taux_horaire = wage / 191 if wage else 0
 result = inputs['HS50'].amount * taux_horaire * 1.50
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
@@ -75,8 +96,12 @@ result = inputs['HS50'].amount * taux_horaire * 1.50
             <field name="condition_python">result = 'HS100' in inputs and inputs['HS100'].amount > 0</field>
             <field name="amount_select">code</field>
             <field name="amount_python_compute">
-wage = payslip.version_id.wage if payslip.version_id else 0
-taux_horaire = wage / 191 if wage else 0
+v = payslip.version_id
+if v and v.wage_type == 'hourly':
+    taux_horaire = v.hourly_wage
+else:
+    wage = v.wage if v else 0
+    taux_horaire = wage / 191 if wage else 0
 result = inputs['HS100'].amount * taux_horaire * 2.00
             </field>
             <field name="struct_id" ref="hr_payroll_structure_ma_employee"/>
@@ -198,8 +223,11 @@ avn_logement = v.l10n_ma_avantage_logement if v else 0
 avn_voiture = v.l10n_ma_avantage_voiture if v else 0
 taux_anc = v.get_anciennete_taux(payslip.date_to) if v else 0
 anciennete = BASIC * taux_anc
-wage = v.wage if v else 0
-taux_horaire = wage / 191 if wage else 0
+if v and v.wage_type == 'hourly':
+    taux_horaire = v.hourly_wage
+else:
+    wage = v.wage if v else 0
+    taux_horaire = wage / 191 if wage else 0
 hs25 = inputs['HS25'].amount * taux_horaire * 1.25 if 'HS25' in inputs else 0
 hs50 = inputs['HS50'].amount * taux_horaire * 1.50 if 'HS50' in inputs else 0
 hs100 = inputs['HS100'].amount * taux_horaire * 2.00 if 'HS100' in inputs else 0
