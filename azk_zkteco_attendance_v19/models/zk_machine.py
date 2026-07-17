@@ -204,13 +204,24 @@ class ZkMachine(models.Model):
         Solo actúa sobre check-outs REALES importados de la máquina; nunca crea
         check-outs automáticos para empleados que no marcaron salida.
         """
+        log.warning(
+            "LUNCH_DBG _maybe_deduct_lunch: ci=%s co=%s lad=%s ldh=%s",
+            check_in_dt, check_out_dt,
+            self.lunch_auto_deduction, self.lunch_deduction_hours,
+        )
         if not self.lunch_auto_deduction:
+            log.warning("LUNCH_DBG lunch_auto_deduction=False → sin descuento")
             return check_out_dt
         lunch_hours = self.lunch_deduction_hours or 1.0
         # 13:00 UTC ≈ 14:00 hora de Marruecos (UTC+1 verano)
         noon_utc = check_in_dt.replace(hour=13, minute=0, second=0, microsecond=0)
+        log.warning("LUNCH_DBG noon_utc=%s condición: %s < %s < %s → %s",
+                    noon_utc, check_in_dt, noon_utc, check_out_dt,
+                    check_in_dt < noon_utc < check_out_dt)
         if check_in_dt < noon_utc < check_out_dt:
-            return check_out_dt - timedelta(hours=lunch_hours)
+            result = check_out_dt - timedelta(hours=lunch_hours)
+            log.warning("LUNCH_DBG deduciendo → %s", result)
+            return result
         return check_out_dt
 
     def download_attendance(self):
