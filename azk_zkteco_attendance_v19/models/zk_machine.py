@@ -40,6 +40,17 @@ class ZkMachine(models.Model):
     last_run_status = fields.Boolean('Machine OK', default=False)
     last_error_msg = fields.Char("Last Error")
 
+    lunch_auto_deduction = fields.Boolean(
+        "Deducir Comida",
+        help="Restar horas de comida al check-out real importado de la máquina",
+        default=False,
+    )
+    lunch_deduction_hours = fields.Float(
+        "Horas de Comida",
+        default=1.0,
+        help="Número de horas a restar del check-out (ej: 1.0 = 1 hora)",
+    )
+
 
     @api.onchange('password')
     def _onchange_password(self):
@@ -331,15 +342,23 @@ class ZkMachine(models.Model):
                                         # ignorar — solo un checkout real de la máquina cierra la asistencia
                                         import_status = 'skipped'
                                 else:
+                                    # Aplicar deducción de comida si está activada
+                                    checkout_ts = atten_time_ts
+                                    if self.lunch_auto_deduction and self.lunch_deduction_hours:
+                                        checkout_ts = atten_time_ts - timedelta(
+                                            hours=self.lunch_deduction_hours
+                                        )
+                                    checkout_time = fields.Datetime.to_string(checkout_ts)
+
                                     if (
                                         previous_check_in
-                                        and previous_check_in.check_in < atten_time_ts
+                                        and previous_check_in.check_in < checkout_ts
                                         and not HRAttendance.search([
                                             ('employee_id', '=', employee.id),
-                                            ('check_out', '=', atten_time),
+                                            ('check_out', '=', checkout_time),
                                         ], limit=1)
                                     ):
-                                        previous_check_in.write({'check_out': atten_time})
+                                        previous_check_in.write({'check_out': checkout_time})
                                         total_checkouts += 1
                                     else:
                                         import_status = 'skipped'
