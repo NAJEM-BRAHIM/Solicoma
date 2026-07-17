@@ -42,13 +42,20 @@ class ZkMachine(models.Model):
 
     lunch_auto_deduction = fields.Boolean(
         "Deducir Comida",
-        help="Restar horas de comida al check-out real importado de la máquina",
+        help="Restar horas de comida al check-out real importado de la máquina, "
+             "solo si el empleado estaba presente a la hora de comida.",
         default=False,
     )
     lunch_deduction_hours = fields.Float(
         "Horas de Comida",
         default=1.0,
         help="Número de horas a restar del check-out (ej: 1.0 = 1 hora)",
+    )
+    lunch_hour_utc = fields.Float(
+        "Hora de Comida (UTC)",
+        default=13.0,
+        help="Hora de comida en UTC (ej: 13.0 = 13:00 UTC = 14:00 Marruecos verano). "
+             "Solo se aplica la deducción si el empleado entró antes y salió después de esta hora.",
     )
 
 
@@ -343,11 +350,23 @@ class ZkMachine(models.Model):
                                         import_status = 'skipped'
                                 else:
                                     # Aplicar deducción de comida si está activada
+                                    # y el empleado estaba presente a la hora de comida
                                     checkout_ts = atten_time_ts
-                                    if self.lunch_auto_deduction and self.lunch_deduction_hours:
-                                        checkout_ts = atten_time_ts - timedelta(
-                                            hours=self.lunch_deduction_hours
+                                    if (
+                                        self.lunch_auto_deduction
+                                        and self.lunch_deduction_hours
+                                        and previous_check_in
+                                    ):
+                                        lunch_h = int(self.lunch_hour_utc)
+                                        lunch_m = int(round((self.lunch_hour_utc - lunch_h) * 60))
+                                        noon_utc = datetime.combine(
+                                            atten_time_ts.date(),
+                                            time(hour=lunch_h, minute=lunch_m),
                                         )
+                                        if previous_check_in.check_in < noon_utc < atten_time_ts:
+                                            checkout_ts = atten_time_ts - timedelta(
+                                                hours=self.lunch_deduction_hours
+                                            )
                                     checkout_time = fields.Datetime.to_string(checkout_ts)
 
                                     if (
