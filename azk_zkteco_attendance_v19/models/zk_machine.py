@@ -319,24 +319,16 @@ class ZkMachine(models.Model):
                                             })
                                         total_checkins += 1
                                     elif previous_check_in.check_in.date() < atten_time_ts.date():
-                                        previous_check_in.write({
-                                            'check_out': previous_check_in.check_in
-                                        })
+                                        # Día diferente: el empleado no marcó salida ayer,
+                                        # se abre nueva asistencia para hoy sin cerrar la anterior
                                         HRAttendance.create({
                                             'employee_id': employee.id,
                                             'check_in': atten_time,
                                         })
                                         total_checkins += 1
-                                    elif (
-                                        previous_check_in.check_in < atten_time_ts
-                                        and not HRAttendance.search([
-                                            ('employee_id', '=', employee.id),
-                                            ('check_out', '=', atten_time),
-                                        ], limit=1)
-                                    ):
-                                        previous_check_in.write({'check_out': atten_time})
-                                        total_checkouts += 1
                                     else:
+                                        # Mismo día, ya hay asistencia abierta:
+                                        # ignorar — solo un checkout real de la máquina cierra la asistencia
                                         import_status = 'skipped'
                                 else:
                                     if (
