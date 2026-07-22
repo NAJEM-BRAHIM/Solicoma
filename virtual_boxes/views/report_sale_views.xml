@@ -16,16 +16,16 @@
                 <span t-if="line.num_boxes" t-out="line.num_boxes"/>
             </td>
         </xpath>
-        <!-- Totales debajo de la columna Description -->
+        <!-- Totales alineados bajo sus columnas (Descripción / Cantidad / Nº Cajas / resto) -->
         <xpath expr="//tbody[hasclass('sale_tbody')]" position="inside">
             <t t-set="vb_lines" t-value="doc.order_line.filtered(lambda l: l.display_type not in ('line_section', 'line_note'))"/>
             <t t-set="vb_total_qty" t-value="sum(vb_lines.mapped('product_uom_qty'))"/>
             <t t-set="vb_total_boxes" t-value="sum(vb_lines.mapped('num_boxes'))"/>
-            <tr style="border-top: 2px solid #dee2e6;">
-                <td colspan="20" class="fw-bold">
-                    Total Cantidad: <span t-out="'%.2f' % vb_total_qty"/>
-                    <span class="ms-4">Total Cajas: <span t-out="vb_total_boxes"/></span>
-                </td>
+            <tr style="border-top: 2px solid #dee2e6;" class="fw-bold">
+                <td>Total</td>
+                <td class="text-end"><span t-out="'%.2f' % vb_total_qty"/></td>
+                <td class="text-end"><span t-out="vb_total_boxes"/></td>
+                <td colspan="10"/>
             </tr>
         </xpath>
     </template>
