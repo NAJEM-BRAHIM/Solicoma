@@ -16,6 +16,9 @@ def post_init_hook(env):
     permisos de escritura que otros grupos pudieran conceder (las reglas
     entre grupos se combinan con AND en Odoo).
     """
+    # Modelos excluidos de ir.rule (Odoo no permite reglas sobre sí mismo)
+    MODELS_SIN_REGLA = {'ir.rule'}
+
     group = env.ref('solicoma_grupos.group_solo_lectura')
     all_models = env['ir.model'].search([('transient', '=', False)])
 
@@ -44,7 +47,7 @@ def post_init_hook(env):
             })
 
         # --- ir.rule: dominio imposible → bloquea write/create/unlink ---
-        if not RuleModel.search([
+        if model.model not in MODELS_SIN_REGLA and not RuleModel.search([
             ('model_id', '=', model.id),
             ('groups', 'in', [group.id]),
         ], limit=1):
