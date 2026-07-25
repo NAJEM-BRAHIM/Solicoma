@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="group_solo_lectura" model="res.groups">
+        <field name="name">Solo Lectura</field>
+        <field name="category_id" ref="base.module_category_hidden"/>
+        <field name="comment">
+            Grupo de auditoría: los usuarios solo pueden visualizar registros.
+            IMPORTANTE: el usuario debe ser también "Usuario Interno" para acceder al backend.
+            Al instalar el módulo se generan automáticamente reglas que bloquean
+            escritura, creación y eliminación en todos los modelos instalados.
+        </field>
+    </record>
+</odoo>
