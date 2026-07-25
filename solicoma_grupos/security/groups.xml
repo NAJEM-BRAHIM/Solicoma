@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="group_solo_lectura" model="res.groups">
+    <!-- Privilege: aparece como etiqueta en el formulario de usuario -->
+    <record id="privilege_solo_lectura" model="res.groups.privilege">
         <field name="name">Solo Lectura</field>
-        <field name="comment">Grupo de auditoría: solo lectura. El usuario debe ser también "Usuario Interno". Al instalar se generan reglas que bloquean escritura, creación y eliminación en todos los modelos.</field>
+        <field name="description">Acceso de auditoría: solo visualización, sin crear ni modificar datos.</field>
+        <field name="placeholder">No</field>
+        <field name="sequence">100</field>
+    </record>
+
+    <!-- Grupo vinculado al privilege -->
+    <record id="group_solo_lectura" model="res.groups">
+        <field name="name">Activado</field>
+        <field name="privilege_id" ref="privilege_solo_lectura"/>
+        <field name="comment">El usuario debe ser también "Usuario Interno". Al instalar se generan reglas que bloquean escritura, creación y eliminación en todos los modelos.</field>
     </record>
 </odoo>
